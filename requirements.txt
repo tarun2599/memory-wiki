@@ -1,0 +1,24 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+alembic==1.14.0
+pydantic==2.10.3
+pydantic-settings==2.7.0
+boto3==1.35.81
+celery[redis]==5.4.0
+redis==5.2.1
+openai==1.58.1
+httpx==0.28.1
+python-multipart==0.0.20
+tenacity==9.0.0
+python-slugify==8.0.4
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.25.0
+pytest-cov==6.0.0
+moto[s3]==5.0.27
+testcontainers[postgres,redis]==4.9.0
+fakeredis==2.26.2
+aiosqlite==0.20.0
