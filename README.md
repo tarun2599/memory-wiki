@@ -1,6 +1,93 @@
 # Memory Wiki
 
+[![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Tests](https://img.shields.io/badge/Tests-pytest-0A9EDC?logo=pytest&logoColor=white)](tests/)
+
 A service that ingests conversation transcripts, extracts structured memories using an LLM, stores them as a navigable file tree in cloud object storage, and exposes unix-style REST endpoints (`ls`, `cat`, `grep`).
+
+**Repository:** https://github.com/tarun2599/memory-wiki
+
+## Demo & Example Output
+
+Run `docker compose up --build`, then `make demo`. Expected flow:
+
+### 1. Ingest a transcript
+
+```bash
+curl -X POST http://localhost:8000/transcripts \
+  -H "Content-Type: application/json" \
+  -d '{"content": "Alice met Bob to discuss Kubernetes. Alice prefers PostgreSQL.", "metadata": {"participants": ["Alice", "Bob"]}}'
+```
+
+```json
+{
+  "id": "a1b2c3d4-...",
+  "processing_job_id": "e5f6g7h8-...",
+  "status": "pending",
+  "message": "Transcript ingested. Memory extraction queued."
+}
+```
+
+### 2. List the memory tree (`ls`)
+
+```bash
+curl "http://localhost:8000/memory/ls?path=/"
+```
+
+```json
+{
+  "path": "/",
+  "entries": [
+    {"name": "entities", "path": "entities", "type": "directory"},
+    {"name": "events", "path": "events", "type": "directory"},
+    {"name": "topics", "path": "topics", "type": "directory"}
+  ]
+}
+```
+
+### 3. Search memories (`grep`)
+
+```bash
+curl "http://localhost:8000/memory/grep?pattern=kubernetes&ignore_case=true"
+```
+
+```json
+{
+  "pattern": "kubernetes",
+  "path": "/",
+  "total_matches": 2,
+  "matches": [
+    {
+      "path": "/topics/kubernetes.md",
+      "line_number": 1,
+      "line": "# Kubernetes"
+    }
+  ]
+}
+```
+
+### 4. Read a memory file (`cat`)
+
+```bash
+curl "http://localhost:8000/memory/cat?path=/entities/people/alice.md"
+```
+
+```json
+{
+  "path": "/entities/people/alice.md",
+  "content": "# Alice\n\nMentioned in conversation...",
+  "content_type": "text/markdown"
+}
+```
+
+### Interactive API docs
+
+Open **http://localhost:8000/docs** for Swagger UI — try all endpoints from the browser.
+
+> **Tip:** Save a screenshot of `/docs` to `docs/screenshots/swagger-ui.png` and embed it here before submitting.
 
 ## Quick Start
 
